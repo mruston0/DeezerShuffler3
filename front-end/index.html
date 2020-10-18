@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+  <title>Deezer Shuffler</title>
+  <style>
+    body {
+      font-family: "Mabry Pro Bold", "Mier B", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"
+    }
+
+    .flexContainer {
+      display: flex;
+    }
+
+    .shufflerHeader {
+      margin: auto;
+    }
+
+    /* General button style */
+    .btn {
+      border: none;
+      font-family: 'Lato';
+      font-size: inherit;
+      color: inherit;
+      background: none;
+      cursor: pointer;
+      padding: 25px px;
+      display: inline-block;
+      margin: 15px 30px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      outline: none;
+      position: relative;
+      -webkit-transition: all 0.3s;
+      -moz-transition: all 0.3s;
+      transition: all 0.3s;
+    }
+
+    .btn:after {
+      content: '';
+      position: absolute;
+      z-index: -1;
+      -webkit-transition: all 0.3s;
+      -moz-transition: all 0.3s;
+      transition: all 0.3s;
+    }
+
+    /* Pseudo elements for icons */
+    .btn:before {
+      font-family: 'FontAwesome';
+      speak: none;
+      font-style: normal;
+      font-weight: normal;
+      font-variant: normal;
+      text-transform: none;
+      line-height: 1;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Button 4 */
+    .btn-4 {
+      /* background: #34495e; */
+      background-image: linear-gradient(to right, #FEAB2E, #D81B60);
+      color: #fff;
+    }
+
+    .btn-4:hover {
+      /* background: #2c3e50; */
+      /* background-image: linear-gradient(to right, #FEAB2E, #D81B60); */
+    }
+
+    .btn-4:active {
+      /* background: #2c3e50; */
+      /* background-image: linear-gradient(to right, #FEAB2E, #D81B60); */
+      top: 2px;
+    }
+
+    .btn-4:before {
+      position: absolute;
+      height: 100%;
+      left: 0;
+      top: 0;
+      line-height: 3;
+      font-size: 140%;
+      width: 60px;
+    }
+
+    /* Icon separator */
+    .btn-sep {
+      padding: 22px 60px 25px 120px;
+      /* Changed from 25px .... */
+    }
+
+    .btn-sep:before {
+      background: rgba(0, 0, 0, 0.15);
+    }
+  </style>
+</head>
+<script>
+  const API_ENDPOINT_URI = "http://lvh.me:3333";
+  const DEEZER_APP_ID = "438242";
+
+  function deezerLogin() {
+    current_url = window.location.href
+    // Set the state so we can navigate back here after the OAuth flow
+    const url = `https://connect.deezer.com/oauth/auth.php?app_id=${DEEZER_APP_ID}&redirect_uri=${API_ENDPOINT_URI}/authcallback&perms=basic_access,email&state=${current_url}`
+    window.location.href = url
+  }
+
+  function refresh_on_url_token() {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    if (urlParams.get('token')) {
+      localStorage.setItem('deezerShuffler.authToken', urlParams.get('token'));
+      window.history.replaceState({}, document.title, "/");
+    }
+  }
+
+  function show_ui() {
+    const item = localStorage.getItem('deezerShuffler.authToken');
+    if (item == null) {
+      document.getElementById('deezerLogin').style.display = "block";
+      document.getElementById('deezerShuffle').style.display = "hidden";
+    }
+    else {
+      document.getElementById('deezerLogin').style.display = "hidden";
+      document.getElementById('deezerShuffle').style.display = "block";
+    }
+  }
+
+  function deezerShuffle() {
+    document.getElementById("albumTitle").innerText = '';
+    document.getElementById("albumImage").src = '';
+    const token = localStorage.getItem('deezerShuffler.authToken')
+    fetch(`${API_ENDPOINT_URI}/randomalbum?token=${token}`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("albumImage").src = data.cover_big;
+        document.getElementById("albumTitle").innerText = data.title;
+        document.getElementById("albumLink").href = `deezer://www.deezer.com/album/${data.album_id}?autoplay=true`
+      })
+  }
+
+  document.onreadystatechange = function () {
+    if (document.readyState == "complete") {
+      refresh_on_url_token();
+      show_ui();
+    }
+  }
+
+</script>
+
+<body>
+  <div class="flexContainer">
+    <div class="shufflerHeader">
+      <h1>
+        <img src="assets/Deezer_Logo_RVB_Black.svg" style="height: 1em" />
+        <i>Album Shuffler</i>
+      </h1>
+    </div>
+  </div>
+
+  <div class="flexContainer">
+    <div id="deezerLogin" class="shufflerHeader" hidden>
+      <button class="btn btn-4 btn-sep fa-sign-in" onclick="deezerLogin()">Login to Deezer</button>
+    </div>
+    <div id="deezerShuffle" class="shufflerHeader" hidden>
+      <button class="btn btn-4 btn-sep fa-random" onclick="deezerShuffle()">Shuffle Albums</button>
+    </div>
+  </div>
+  <div class="flexContainer">
+    <div class="shufflerHeader">
+      <h1 style="text-align: center;">
+        <span id="albumTitle"></span>
+      </h1>
+      <a id="albumLink">
+        <img id="albumImage" style="max-width:100%"/>
+      </a>
+    </div>
+  </div>
+
+  <a href="https://github.com/mruston0" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#D81B60; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+</body>
+
+</html>
