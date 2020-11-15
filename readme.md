@@ -9,3 +9,10 @@ DeezerShuffler3 is a minimalist serverless web app that randomly selects an albu
 - Python
 - [Architect](https://arc.codes/)
 - AWS
+
+## How to deploy
+
+### Production
+
+1. Run `arc deploy production` within the `api` folder to deploy the back-end API. Your default AWS credentials will be used.
+2. Merge front-end changes to the `prod` branch and AWS Amplify will automatically deploy the front-end.
