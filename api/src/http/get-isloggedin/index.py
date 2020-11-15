@@ -2,8 +2,6 @@ import jwt
 import json
 
 def handler(req, context):
-    print(req.get("cookies"))
-
     # iterate to find the user cookie
     isLoggedIn = False
     if "cookies" in req:
@@ -13,8 +11,6 @@ def handler(req, context):
                 token = jwt.decode(jwt_encoded, 'secret', algorithm='HS256')
                 if token.get("id"):
                     isLoggedIn = True
-    print(f"Returning isLoggedIn = {isLoggedIn}")
-    
     return {
         'headers': {
             'Access-Control-Allow-Origin': '*',

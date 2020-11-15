@@ -28,7 +28,6 @@ class Deezer:
     def get_user(self, access_token):
         url = f"https://api.deezer.com/user/me?access_token={access_token}"
         response_json = requests.get(url).json()
-        print(response_json)
         deezer_id = response_json["id"]
         deezer_name = response_json["name"]
         deezer_picture = response_json["picture_medium"]
@@ -44,20 +43,16 @@ class Deezer:
 
     def _get_favourite_albums(self, access_token, albums, next):
         if next:
-            print(f"next url is {next}")
             url = next
         else:
             url = f"https://api.deezer.com/user/me/albums?access_token={access_token}"
         result = requests.get(url).json()
 
         for album in result.get('data'):
-            #print(f"[DeezerAPI] Obtained {album['title']}")
             albums.append(album)
         
         if 'next' in result:
-            print("Paginating....")
             return self._get_favourite_albums(access_token, albums, next=result['next'])
-        print("Not paginating...")
         return albums
 
 
