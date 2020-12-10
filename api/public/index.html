@@ -128,7 +128,7 @@
   const vars = get_env_vars();
 
   function deezerLogin() {
-    current_url = window.location.href
+    current_url = window.location.host
     // Set the state so we can navigate back here after the OAuth flow
     const url = `https://connect.deezer.com/oauth/auth.php?app_id=${vars.DEEZER_APP_ID}&redirect_uri=${vars.API_ENDPOINT_URI}/authcallback&perms=basic_access,email&state=${current_url}`
     window.location.href = url

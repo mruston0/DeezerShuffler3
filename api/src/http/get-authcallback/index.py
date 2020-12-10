@@ -44,7 +44,7 @@ def handler(req, context):
   return { 
     'statusCode': 302,
     'headers': {
-      'location': f'{state}?token={jwt_token.decode("utf-8")}'
+      'location': f'https://{state}?token={jwt_token.decode("utf-8")}'
     }
   }
     
