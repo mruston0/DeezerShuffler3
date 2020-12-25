@@ -19,7 +19,8 @@ def handler(req, context):
     token = jwt.decode(jwt_encoded, jwt_secret, algorithm='HS256')
 
     # Cache the album counts in a variable outside of the function 
-    # context so Lambda will perist between function calls. Saves a few hits to Dynamo sometimes.
+    # context. Lambda will perist between function calls. 
+    # Saves a few hits to Dynamo sometimes.
     user_id = token['id']
     if user_id not in user_album_counts:
         album_count = DeezerShufflerRepository().get_user_album_count(user_id)
