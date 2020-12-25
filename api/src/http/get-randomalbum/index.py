@@ -4,16 +4,19 @@ import random
 import logging
 from vendor.shared.repositories.deezer_shuffler import DeezerShufflerRepository
 from jwt import algorithms
+import os
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 user_album_counts = {}
 
+jwt_secret = os.environ['JWT_SECRET']
+
 def handler(req, context):
     jwt_encoded = req.get('queryStringParameters', {}).get('token')
 
-    token = jwt.decode(jwt_encoded, 'secret', algorithm='HS256')
+    token = jwt.decode(jwt_encoded, jwt_secret, algorithm='HS256')
 
     # Cache the album counts in a variable outside of the function 
     # context so Lambda will perist between function calls. Saves a few hits to Dynamo sometimes.

@@ -1,7 +1,5 @@
 node_modules/
 
-
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -13,5 +11,5 @@ sam.yaml
 .arc-env
 dist/
 MANIFEST
-
 vendor/
+preferences.arc

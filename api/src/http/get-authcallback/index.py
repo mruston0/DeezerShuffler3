@@ -8,6 +8,7 @@ import json
 from vendor.shared.services.deezer import Deezer
 import os
 
+jwt_secret = os.environ['JWT_SECRET']
 
 def handler(req, context):
   code = req.get('queryStringParameters', {}).get('code')
@@ -37,7 +38,7 @@ def handler(req, context):
 
     jwt_token = jwt.encode(
       {'id': user["id"]},
-      'secret',
+      jwt_secret,
       algorithm='HS256'
     )
   
